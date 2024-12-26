@@ -3,14 +3,14 @@
 echo "Building rootfs..."
 
 CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}"
-ROOTFS_DIR="$CACHE_DIR/devtools-loong64/rootfs"
+ROOTFS_DIR="$CACHE_DIR/devtools-loong64/root.loong64"
 mkdir -p "$ROOTFS_DIR"
 
 sudo pacstrap \
     -C /usr/share/devtools/pacman.conf.d/extra-loong64.conf \
     -M \
     "$ROOTFS_DIR" \
-    base
+    base arch-install-scripts
 
 echo "Clean up pacman package cache..."
 yes y | sudo pacman -Scc --sysroot "$ROOTFS_DIR"
