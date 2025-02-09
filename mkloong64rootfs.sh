@@ -2,6 +2,7 @@
 
 echo "Building rootfs..."
 
+BUILD_DATE=$(date +%Y.%m.%d)
 CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}"
 ROOTFS_DIR="$CACHE_DIR/devtools-loong64/root.loong64"
 mkdir -p "$ROOTFS_DIR"
@@ -23,18 +24,18 @@ sudo bsdtar --create \
     -C "$(dirname "$ROOTFS_DIR")" \
     "$(basename "$ROOTFS_DIR")" \
     | zstd -c -f -T0 -15 - \
-    -o "archlinux-bootstrap-$(date +%Y.%m.%d)-loong64.tar.zst"
-sha512sum "archlinux-bootstrap-$(date +%Y.%m.%d)-loong64.tar.zst" > "archlinux-bootstrap-$(date +%Y.%m.%d)-loong64.tar.zst.sha512"
+    -o "archlinux-bootstrap-${BUILD_DATE}-loong64.tar.zst"
+sha512sum "archlinux-bootstrap-${BUILD_DATE}-loong64.tar.zst" > "archlinux-bootstrap-${BUILD_DATE}-loong64.tar.zst.sha512"
 
 echo "Compressing rootfs to squashfs..."
 # Uncomment -keep-as-directory will include top directory `rootfs.loong64`
 sudo mksquashfs \
     "$ROOTFS_DIR" \
-    "archlinux-bootstrap-$(date +%Y.%m.%d)-loong64.sfs" \
+    "archlinux-bootstrap-${BUILD_DATE}-loong64.sfs" \
     -noappend \
     -comp zstd \
     -Xcompression-level 15 #-keep-as-directory
-sha512sum "archlinux-bootstrap-$(date +%Y.%m.%d)-loong64.sfs" > "archlinux-bootstrap-$(date +%Y.%m.%d)-loong64.sfs.sha512"
+sha512sum "archlinux-bootstrap-${BUILD_DATE}-loong64.sfs" > "archlinux-bootstrap-${BUILD_DATE}-loong64.sfs.sha512"
 
 echo "Clean up rootfs directory..."
 sudo rm -rf "$ROOTFS_DIR"
