@@ -5,7 +5,7 @@ echo "Building rootfs..."
 BUILD_DATE=$(date +%Y.%m.%d)
 CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}"
 ROOTFS_DIR="$CACHE_DIR/devtools-loong64/root.loong64"
-mkdir -p "$ROOTFS_DIR"
+sudo mkdir -p "$ROOTFS_DIR"
 
 sudo pacstrap \
     -C /usr/share/devtools/pacman.conf.d/extra-loong64.conf \
