@@ -17,7 +17,7 @@ def process_patch(patch_path):
     filtered_lines = []
     for line in lines:
         line = line.strip()
-        if line.startswith('+CONFIG_') and (line.endswith('=y') or line.endswith('=m')):
+        if line.startswith('+CONFIG_') and (not line.endswith('=n')):
             # Remove leading + character
             filtered_lines.append(line[1:] + '\n')
 
