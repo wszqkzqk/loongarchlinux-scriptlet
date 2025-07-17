@@ -29,6 +29,9 @@ if ! flock -n 9; then
   exit 0
 fi
 
+# Update `lastupdate` file
+echo "$(date +%s)" > "$SOURCE_DIR/lastupdate"
+
 # Synchronization process
 echo "==================================================" | tee -a "$LOG_FILE"
 echo "Sync STARTED at: $(date)" | tee -a "$LOG_FILE"
