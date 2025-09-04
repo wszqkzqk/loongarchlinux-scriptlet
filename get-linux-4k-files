@@ -1,0 +1,58 @@
+#!/bin/bash
+
+show_help() {
+    echo "Usage: $0 [OUTPUT_DIR]"
+    echo "Prepare Linux kernel source with 4K-page-size modifications"
+    echo
+    echo "Arguments:"
+    echo "  OUTPUT_DIR    Output directory (default: ./linux-4k)"
+    echo
+    echo "Options:"
+    echo "  -h, --help    Show this help message"
+    exit 0
+}
+
+# Parse command line arguments
+if [[ $1 == "-h" || $1 == "--help" ]]; then
+    show_help
+fi
+
+OUTPUT_DIR="${1:-$(realpath ./linux-4k)}"  # Use argument or default
+
+workdir=$(mktemp -d -p /tmp)
+cd "$workdir"
+
+get-loong64-pkg --mirror https://mirrors.wsyu.edu.cn/archlinux linux-lts
+cd linux-lts
+
+# Modify PKGBUILD for 4K page size
+sed -i \
+    -e 's/^\(\s*\)pkgbase=.*/\1pkgbase=linux-4k/' \
+    -e '/^\s*make\s\+olddefconfig\b/ {
+i\
+  echo "CONFIG_4KB_4LEVEL=y" >> .config
+}' PKGBUILD
+
+# Create output directory and export repository
+mkdir -p "$OUTPUT_DIR"
+echo "Exporting repository to: $OUTPUT_DIR"
+git ls-files | xargs cp --parents -t "$OUTPUT_DIR"
+
+# Copy untracked source files
+sources=$(. PKGBUILD && echo "${source[@]}")
+untracked_files=$(git ls-files --others --exclude-standard)
+
+for file in $sources; do
+    if [ -f "$file" ]; then
+        for untracked in $untracked_files; do
+            if [[ $file == $untracked ]]; then
+                echo "Copying additional file: $file"
+                cp -v "$file" "$OUTPUT_DIR"
+                break
+            fi
+        done
+    fi
+done
+
+echo "Preparation complete. Output directory: $OUTPUT_DIR"
+rm -rf "$workdir"
